@@ -4,94 +4,97 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#1a1a2e">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Catálogo de Just Dance">
-    <title>Just Dance - Catálogo</title>
+    <meta name="description" content="">
+    <title></title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-
         <div id="loadingSection" aria-live="polite" aria-busy="true">
-            <div class="spinner" role="status" aria-label="Carregando"></div>
-            <div>Carregando Catálogo...</div>
+            <div class="spinner" role="status"></div>
+            <div id="loadingText"></div>
         </div>
 
         <main id="mainApp" class="hidden">
             <header class="header">
-                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Alternar tema">🌙</button>
+                <button type="button" class="theme-toggle" id="themeToggle"></button>
                 <div class="header-content">
-                    <h1>🎵 Just Dance Catálogo</h1>
-                    <div class="header-stats">
-                        <div class="stat">
-                            <div class="stat-num" id="totalMusics">0</div>
-                            <div class="stat-label">Músicas</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-num" id="uniqueGames">0</div>
-                            <div class="stat-label">Jogos</div>
-                        </div>
-                    </div>
+                    <h1 id="catalogTitle"></h1>
+                    <p class="header-subtitle" id="catalogSubtitle"></p>
                 </div>
             </header>
 
-            <nav class="tabs" role="tablist" aria-label="Navegação do catálogo">
-                <button type="button" class="tab-btn active" id="tabTrending" role="tab"
-                        aria-selected="true" aria-controls="catalogPanel">🔥 Recomendações</button>
-                <button type="button" class="tab-btn" id="tabLibrary" role="tab"
-                        aria-selected="false" aria-controls="catalogPanel">📚 Biblioteca</button>
+            <nav class="tabs" role="tablist" id="catalogTabs">
+                <button type="button" class="tab-btn active" id="tabTrending" role="tab" aria-selected="true" aria-controls="catalogPanel"></button>
+                <button type="button" class="tab-btn" id="tabLibrary" role="tab" aria-selected="false" aria-controls="catalogPanel"></button>
             </nav>
 
             <div id="catalogPanel" role="tabpanel" aria-labelledby="tabTrending">
                 <div id="weightControls" class="dashboard-controls">
                     <div class="slider-group">
                         <div class="slider-header">
-                            <span class="sp-label">Peso Spotify</span>
-                            <span id="valSp" class="weight-badge">1</span>
+                            <span class="sp-label" id="spotifyWeightLabel"></span>
+                            <span id="valSp" class="weight-badge"></span>
                         </div>
-                        <input type="range" id="weightSp" min="0" max="10" step="0.5" value="1"
-                               aria-label="Peso do ranking Spotify">
+                        <input type="range" id="weightSp" min="0" max="10" step="0.5" value="1">
                     </div>
                     <div class="slider-group">
                         <div class="slider-header">
-                            <span class="yt-label">Peso YouTube</span>
-                            <span id="valYt" class="weight-badge yt-badge">2</span>
+                            <span class="yt-label" id="youtubeWeightLabel"></span>
+                            <span id="valYt" class="weight-badge yt-badge"></span>
                         </div>
-                        <input type="range" id="weightYt" min="0" max="10" step="0.5" value="2"
-                               aria-label="Peso do ranking YouTube">
+                        <input type="range" id="weightYt" min="0" max="10" step="0.5" value="2">
                     </div>
                 </div>
 
-                <section class="filters-section" aria-label="Filtros de busca">
-                    <div class="filters-grid">
-                        <div class="filter-group search-full">
-                            <label for="searchGeneral">🔍 Pesquisar</label>
-                            <input type="search" id="searchGeneral" placeholder="Nome, artista..." autocomplete="off">
-                        </div>
-                        <div class="filter-group">
-                            <label for="filterGenre">Gênero</label>
-                            <select id="filterGenre"></select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="filterDecade">Década</label>
-                            <select id="filterDecade"></select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="filterGame">Jogos</label>
-                            <select id="filterGame"></select>
-                        </div>
-                        <div class="filter-group">
-                            <label for="filterPlayers">Dançarinos</label>
-                            <select id="filterPlayers"></select>
-                        </div>
+                <section id="recommendationControls" class="recommendation-controls">
+                    <div class="recommendation-heading">
+                        <h2 id="recommendationTitle"></h2>
+                        <p id="recommendationDescription"></p>
                     </div>
-                    <div class="filter-actions">
-                        <button type="button" class="btn-reset" id="btnResetFilters">↻ Limpar</button>
+                    <div class="recommendation-grid">
+                        <label class="rule-control">
+                            <span id="jdnextGamesLabel"></span>
+                            <select id="ruleJdnextGames" multiple></select>
+                        </label>
+                        <label class="rule-control">
+                            <span id="jdnextPercentLabel"></span>
+                            <input type="number" id="ruleJdnextPercent" min="0" max="100" step="1" value="20">
+                        </label>
+                        <label class="rule-control">
+                            <span id="lastgameLabel"></span>
+                            <select id="ruleLastgame"></select>
+                        </label>
+                        <label class="rule-control">
+                            <span id="lastgamePercentLabel"></span>
+                            <input type="number" id="ruleLastgamePercent" min="0" max="100" step="1" value="10">
+                        </label>
+                        <label class="rule-control">
+                            <span id="discoverPercentLabel"></span>
+                            <input type="number" id="ruleDiscoverPercent" min="0" max="100" step="1" value="20">
+                        </label>
+                        <label class="rule-control">
+                            <span id="normalPercentLabel"></span>
+                            <input type="number" id="ruleNormalPercent" min="0" max="100" step="1" value="50">
+                        </label>
                     </div>
                 </section>
 
-                <p class="results-info" aria-live="polite">
-                    Exibindo <strong id="resultCount">0</strong> músicas
-                </p>
+                <section class="filters-section" id="filtersSection">
+                    <div class="filters-grid">
+                        <div class="filter-group search-full">
+                            <label for="searchGeneral" id="searchLabel"></label>
+                            <input type="search" id="searchGeneral" autocomplete="off">
+                        </div>
+                        <div class="filter-group"><label for="filterGenre" id="genreLabel"></label><select id="filterGenre"></select></div>
+                        <div class="filter-group"><label for="filterDecade" id="decadeLabel"></label><select id="filterDecade"></select></div>
+                        <div class="filter-group"><label for="filterGame" id="gameLabel"></label><select id="filterGame"></select></div>
+                        <div class="filter-group"><label for="filterPlayers" id="playersLabel"></label><select id="filterPlayers"></select></div>
+                    </div>
+                    <div class="filter-actions"><button type="button" class="btn-reset" id="btnResetFilters"></button></div>
+                </section>
+
+                <p class="results-info" aria-live="polite" id="resultsInfo"></p>
                 <div class="music-grid" id="musicGrid"></div>
             </div>
         </main>
@@ -100,23 +103,19 @@
     <div class="modal" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalArtist">
         <div class="modal-content" id="modalContentBox">
             <div class="modal-header">
-                <div class="modal-header-info">
-                    <h2 class="modal-title" id="modalTitle"></h2>
-                    <p class="modal-artist" id="modalArtist"></p>
-                </div>
-                <button type="button" class="modal-close" id="modalClose" aria-label="Fechar prévia">✕</button>
+                <div class="modal-header-info"><h2 class="modal-title" id="modalTitle"></h2><p class="modal-artist" id="modalArtist"></p></div>
+                <button type="button" class="modal-close" id="modalClose">×</button>
             </div>
             <div class="modal-body">
                 <div class="video-container" id="vidContainer">
-                    <div id="bufferLoading" class="buffer-loading" role="status" aria-live="polite">Sincronizando...</div>
-                    <video id="modalVideoPlayer" controls preload="metadata"></video>
+                    <div id="bufferLoading" class="buffer-loading" role="status" aria-live="polite"></div>
+                    <video id="modalVideoPlayer" controls preload="auto"></video>
                 </div>
                 <div class="modal-tags" id="modalTags"></div>
             </div>
         </div>
     </div>
-    <audio id="modalAudioPlayer" preload="metadata"></audio>
-
+    <audio id="modalAudioPlayer" preload="auto"></audio>
     <script src="app.js"></script>
 </body>
 </html>
