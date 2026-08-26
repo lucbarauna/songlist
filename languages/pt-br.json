@@ -1,6 +1,6 @@
 {
   "ui": {
-    "documentTitle": "Just Dance - Catálogo",
+    "documentTitle": "Catálogo de músicas",
     "documentDescription": "Catálogo de músicas de Just Dance",
     "loading": "Carregando catálogo...",
     "theme": "Tema",
@@ -10,7 +10,7 @@
     "activateDarkTheme": "Ativar tema escuro",
     "catalogTitle": "Catálogo de músicas",
     "catalogSubtitle": "Escolha sua próxima dança!",
-    "tabTrending": "Recomendações",
+    "tabTrending": "Recomendados",
     "tabLibrary": "Biblioteca",
     "navigation": "Navegação do catálogo",
     "spotifyWeight": "Peso Spotify",
@@ -33,7 +33,7 @@
     "games": "Jogos",
     "dancers": "Dançarinos",
     "all": "Todos",
-    "clear": "Limpar",
+    "clear": "Limpar filtros",
     "clearFilters": "Limpar filtros",
     "showing": "Exibindo {count} músicas",
     "noResults": "Sem resultados",
