@@ -9,8 +9,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <title>JD Maps</title>
-<script src="https://unpkg.com/brotli@1.3.3/brotli.js" defer></script>
-
 <style>
 :root{--color-primary:#667eea;--color-secondary:#764ba2;--color-surface:#f8f9ff;--color-card:#fff;--color-text:#1a1a2e;--color-muted:#666;--color-border:#e0e0e0;--tag-text:#24458f;--shadow:0 4px 10px rgba(102,126,234,.1);--shadow-hover:0 8px 20px rgba(102,126,234,.2);--transition:background-color .2s,color .2s,border-color .2s,transform .2s;--music-color:#667eea}
 [data-theme="dark"]{--color-surface:#0f0f1e;--color-card:#1a1a2e;--color-text:#e0e0e0;--color-muted:#a0a0a0;--color-border:#2d2d3d;--tag-text:#91adff;--shadow:0 4px 10px #0006;--shadow-hover:0 8px 20px rgba(102,126,234,.2)}
@@ -40,7 +38,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .recommendation-grid{display:grid;grid-template-columns:minmax(220px,2fr) repeat(5,minmax(120px,1fr));gap:12px}
 .rule-control{display:flex;flex-direction:column;gap:7px;color:var(--color-muted);font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
 .rule-control select,.rule-control input{min-height:42px;padding:9px 10px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);color:var(--color-text);font:inherit;text-transform:none}
-.rule-control select[multiple]{min-height:100px}
 .slider-group{display:flex;flex-direction:column;gap:8px}
 .slider-header{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;text-transform:uppercase}
 .sp-label{color:#1db954}
@@ -125,7 +122,6 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 .checkbox-list label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;text-transform:none;background:var(--color-card);padding:4px 8px;border-radius:6px;border:1px solid var(--color-border);cursor:pointer}
 .checkbox-list input[type=checkbox]{width:auto;min-height:auto;accent-color:var(--color-primary)}
 </style>
-
 </head>
 <body>
 <div class="container">
@@ -212,7 +208,11 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 </div>
 </div>
 <audio id="modalAudioPlayer" preload="auto"></audio>
-<script>
+
+<script type="module">
+import brotliPromise from 'https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module';
+
+let brotli = null;
 const $=$=>document.getElementById($),Z=20,Y='https://jd-s3.cdn.ubi.com/public/jdnext/maps',X={activeUuid:null,animationFrameId:null,isReadyToPlay:!1,isStarting:!1,lastFocusedEl:null},W='0 0 10px rgba(0,0,0,0.5)',V=window.matchMedia('(max-width:768px)');
 let db=[],fl=[],rf=[],masterShuffle=[],tr={},cm='trending',lm=20,sd=null,rr=null,pa=null,ls=null,vp=$('modalVideoPlayer'),ap=$('modalAudioPlayer'),bl=$('bufferLoading'),mb=$('modalContentBox'),vm=$('videoModal');
 
@@ -239,25 +239,18 @@ let g=Array.isArray(s.g)?s.g.map(String):[],D=Array.isArray(s.d)?s.d.map(String)
 return{uuid:u,title:s.t||c('unknownTitle')||'Desconhecido',artist:s.a||c('unknownArtist')||'Desconhecido',videoUrl:e(u,s.w,'video'),audioUrl:e(u,s.z,'audio'),spotifyRank:Number.isFinite(Number(s.s))?Number(s.s):9e15,youtubeRank:Number.isFinite(Number(s.y))?Number(s.y):9e15,bpm:Number(s.b)||120,color:b(`#${s.h||'667eea'}`),originalGame:o,gameLabel:d('o',o,o),coachCount:Number(s.c)||1,genreCodes:g,decadeCodes:D,genreLabel:g.map(x=>d('g',x,x)).join('/'),decadeLabel:D.map(x=>d('d',x,x)).join('/'),products:P}
 }
 
-async function waitForBrotli() {
-    while(typeof BrotliDecode === 'undefined') {
-        await new Promise(r => setTimeout(r, 50));
-    }
-}
 async function fetchBrotli(url) {
-    await waitForBrotli();
+    if(!brotli) brotli = await brotliPromise;
     let res = await fetch(url);
-    if(!res.ok) throw new Error('Fetch failed: ' + url);
+    if(!res.ok) throw new Error('Falha ao baixar ' + url);
     let buf = await res.arrayBuffer();
-    let dec = BrotliDecode(new Int8Array(buf));
-    return JSON.parse(new TextDecoder().decode(dec));
+    let decompressed = brotli.decompress(new Uint8Array(buf));
+    return JSON.parse(new TextDecoder().decode(decompressed));
 }
-async function fetchSongs(){
-    return await fetchBrotli('./songs.br');
-}
+
 async function g(){
     let langPromise=fetchBrotli(`./languages/${userLang}.br`).catch(()=>null);
-    let songsData=await Promise.all([langPromise,fetchSongs()]).then(([lang,songs])=>{if(lang)tr=lang;h();return songs});
+    let songsData=await Promise.all([langPromise,fetchBrotli('./songs.br')]).then(([lang,songs])=>{if(lang)tr=lang;h();return songs});
     let allDb=Object.entries(songsData).map(([u,s])=>f(u,s));
     
     if(userProducts && userProducts.length > 0) {
@@ -499,7 +492,7 @@ return`<article class="music-card"><div class="music-cover-wrapper" style="backg
 function I(){return db.find(x=>x.uuid===X.activeUuid)?.bpm||120}
 function J(m){m.pause();m.removeAttribute('src');m.load()}
 function K(m){if(m.readyState>=4)return Promise.resolve();return new Promise(r=>{let d=()=>{m.removeEventListener('canplaythrough',d);r()};m.addEventListener('canplaythrough',d,{once:!0})})}
-window.openModal=S=function(u,triggerEl){
+window.openModal=function(u,triggerEl){
 let s=db.find(x=>x.uuid===u);if(!s)return;X.lastFocusedEl=triggerEl||document.activeElement;J(vp);J(ap);X.activeUuid=u;X.isReadyToPlay=!1;
 $('modalTitle').textContent=s.title;$('modalArtist').textContent=s.artist;
 $('modalTags').innerHTML=[`<span class="music-tag">${s.coachCount}👤</span>`,`<span class="music-tag">${a(s.gameLabel)}</span>`,s.genreLabel?`<span class="music-tag">${a(s.genreLabel)}</span>`:'',s.decadeLabel?`<span class="music-tag">${a(s.decadeLabel)}</span>`:''].join('');
@@ -531,12 +524,13 @@ vp.onpause=()=>ap.pause();
 vp.onplay=()=>{if(X.isReadyToPlay&&!X.isStarting&&ap.paused)ap.play().catch(()=>{})};
 vp.onseeked=()=>{ap.currentTime=vp.currentTime};
 vp.ontimeupdate=M;
-window.closeModal=T=function(){
+window.closeModal=function(){
 if(!vm.classList.contains('active'))return;
 vm.classList.remove('active');document.body.style.overflow='';$('mainApp').removeAttribute('aria-hidden');
 cancelAnimationFrame(X.animationFrameId);X.activeUuid=null;X.isReadyToPlay=!1;X.isStarting=!1;J(vp);J(ap);pa=null;ls=null;mb.style.boxShadow=W;bl.style.display='none';
 if(X.lastFocusedEl&&typeof X.lastFocusedEl.focus==='function')X.lastFocusedEl.focus();
 };
+let S=window.openModal,T=window.closeModal;
 function P(){let h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');localStorage.setItem('theme',h.getAttribute('data-theme'));R()}
 function Q(){if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}
 function R(){let i=document.documentElement.getAttribute('data-theme')==='dark',t=i?'☀ Modo Claro':'🌙 Modo Escuro';if($('themeToggle'))$('themeToggle').textContent=t}
@@ -545,8 +539,14 @@ if(!entries[0].isIntersecting)return;
 let u=E();if(lm>=u.length)return;
 let p=lm;lm=Math.min(lm+Z,u.length);G(!0,p);
 },{rootMargin:'400px'}).observe($('scrollSentinel'));
+
 document.addEventListener('DOMContentLoaded',()=>{
-i();g().then(k).catch(e=>{console.error(e);$('loadingSection').innerHTML=`<h2>Erro ao Carregar</h2><p>Verifique sua conexão e tente novamente.</p><button type="button" id="retryLoad">Tentar Novamente</button>`;if($('retryLoad'))$('retryLoad').addEventListener('click',()=>location.reload())})
+    i();
+    g().then(k).catch(e=>{
+        console.error(e);
+        $('loadingSection').innerHTML=`<h2>Erro ao Carregar</h2><p>Verifique se songs.br e languages/${userLang}.br estão no mesmo diretório.</p><button type="button" id="retryLoad">Tentar Novamente</button>`;
+        if($('retryLoad'))$('retryLoad').addEventListener('click',()=>location.reload());
+    });
 });
 </script>
 </body>
