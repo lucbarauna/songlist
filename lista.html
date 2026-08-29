@@ -201,10 +201,7 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 </div>
 <audio id="modalAudioPlayer" preload="auto"></audio>
 
-<script type="module">
-import brotliPromise from 'https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module';
-
-let brotli = null;
+<script>
 const $=$=>document.getElementById($),Z=20,Y='https://jd-s3.cdn.ubi.com/public/jdnext/maps',X={activeUuid:null,animationFrameId:null,isReadyToPlay:!1,isStarting:!1,lastFocusedEl:null},W='0 0 10px rgba(0,0,0,0.5)',V=window.matchMedia('(max-width:768px)');
 let db=[],fl=[],rf=[],masterShuffle=[],tr={},cm='trending',lm=20,sd=null,rr=null,pa=null,ls=null,vp=$('modalVideoPlayer'),ap=$('modalAudioPlayer'),bl=$('bufferLoading'),mb=$('modalContentBox'),vm=$('videoModal');
 
@@ -231,18 +228,18 @@ let g=Array.isArray(s.g)?s.g.map(String):[],D=Array.isArray(s.d)?s.d.map(String)
 return{uuid:u,title:s.t||c('unknownTitle')||'Desconhecido',artist:s.a||c('unknownArtist')||'Desconhecido',videoUrl:e(u,s.w,'video'),audioUrl:e(u,s.z,'audio'),spotifyRank:Number.isFinite(Number(s.s))?Number(s.s):9e15,youtubeRank:Number.isFinite(Number(s.y))?Number(s.y):9e15,bpm:Number(s.b)||120,color:b(`#${s.h||'667eea'}`),originalGame:o,gameLabel:d('o',o,o),coachCount:Number(s.c)||1,genreCodes:g,decadeCodes:D,genreLabel:g.map(x=>d('g',x,x)).join('/'),decadeLabel:D.map(x=>d('d',x,x)).join('/'),products:P}
 }
 
-async function fetchBrotli(url) {
-    if(!brotli) brotli = await brotliPromise;
+async function fetchGzip(url) {
     let res = await fetch(url);
     if(!res.ok) throw new Error('Falha ao baixar ' + url);
-    let buf = await res.arrayBuffer();
-    let decompressed = brotli.decompress(new Uint8Array(buf));
-    return JSON.parse(new TextDecoder().decode(decompressed));
+    let ds = new DecompressionStream('gzip');
+    let stream = res.body.pipeThrough(ds);
+    let text = await new Response(stream).text();
+    return JSON.parse(text);
 }
 
 async function g(){
-    let langPromise=fetchBrotli(`./languages/${userLang}.br`).catch(()=>null);
-    let songsData=await Promise.all([langPromise,fetchBrotli('./songs.br')]).then(([lang,songs])=>{if(lang)tr=lang;h();return songs});
+    let langPromise=fetchGzip(`./languages/${userLang}.gz`).catch(()=>null);
+    let songsData=await Promise.all([langPromise,fetchGzip('./songs.gz')]).then(([lang,songs])=>{if(lang)tr=lang;h();return songs});
     let allDb=Object.entries(songsData).map(([u,s])=>f(u,s));
     
     if(userProducts && userProducts.length > 0) {
@@ -527,7 +524,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     i();
     g().then(k).catch(e=>{
         console.error(e);
-        $('loadingSection').innerHTML=`<h2>Erro ao Carregar</h2><p>Verifique se songs.br e languages/${userLang}.br estão no mesmo diretório.</p><button type="button" id="retryLoad">Tentar Novamente</button>`;
+        $('loadingSection').innerHTML=`<h2>Erro ao Carregar</h2><p>Verifique se songs.gz e languages/${userLang}.gz estão no mesmo diretório.</p><button type="button" id="retryLoad">Tentar Novamente</button>`;
         if($('retryLoad'))$('retryLoad').addEventListener('click',()=>location.reload());
     });
 });
