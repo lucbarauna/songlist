@@ -481,7 +481,7 @@ $('modalTitle').textContent=s.title;$('modalArtist').textContent=s.artist;
 $('modalTags').innerHTML=[`<span class="music-tag">${s.coachCount}👤</span>`,`<span class="music-tag">${a(s.gameLabel)}</span>`,s.genreLabel?`<span class="music-tag">${a(s.genreLabel)}</span>`:'',s.decadeLabel?`<span class="music-tag">${a(s.decadeLabel)}</span>`:''].join('');
 document.documentElement.style.setProperty('--music-color',s.color);
 vp.muted=!0;vp.preload='auto';ap.preload='auto';vp.src=s.videoUrl;ap.src=s.audioUrl;
-bl.style.display='flex';bl.textContent='Carregando Buffer...';vm.classList.add('active');
+bl.style.display='flex';bl.textContent='Carregando...';vm.classList.add('active');
 document.body.style.overflow='hidden';$('mainApp').setAttribute('aria-hidden','true');
 requestAnimationFrame(()=>$('modalClose').focus());
 let au=u;Promise.all([K(vp),K(ap)]).then(()=>{if(X.activeUuid===au)L()}).catch(()=>{if(X.activeUuid===au)bl.textContent='Erro de Prévia'})
