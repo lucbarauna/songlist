@@ -65,19 +65,8 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 .badge{position:absolute;background:rgba(0,0,0,.85);color:#fff;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.3);max-width:70%;overflow:hidden;text-overflow:ellipsis;z-index:2}
 .badge-players{bottom:10px;left:10px;display:inline-flex;align-items:center;gap:3px}
 .badge-game{bottom:10px;right:10px}
-.badge-quota{top:10px;right:10px;font-size:10px;max-width:60%}
-.quota-normal{background:rgba(102,126,234,.94)}
-.quota-next{background:rgba(255,152,0,.94)}
-.quota-lastgame{background:rgba(156,39,176,.94)}
-.quota-descoberta{background:rgba(76,175,80,.94)}
-.rank-badges{position:absolute;top:10px;left:10px;z-index:3;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
-.badge-rank{position:static;max-width:100%;font-size:10px}
-.badge-spotify{background:rgba(29,185,84,.92)}
-.badge-youtube{background:rgba(255,0,0,.9)}
-.badge-final{background:rgba(35,137,218,.94)}
 @media (max-width:480px){
-.rank-badges{top:7px;left:7px;gap:3px}.badge-rank{padding:4px 6px;font-size:9px}
-.badge-quota{top:7px;right:7px;padding:4px 6px;font-size:9px}
+.badge-game{padding:4px 6px;font-size:9px}
 }
 .music-info{padding:14px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
 .music-name{font-weight:700;font-size:14px;color:var(--color-text);margin-bottom:6px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -110,9 +99,6 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 .filters-section{padding:15px}
 .filters-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.search-full{grid-column:1/-1}
 .tabs{gap:6px}.tab-btn{font-size:14px;padding:8px 12px;flex:1;text-align:center}
-.dashboard-controls,.recommendation-controls{grid-template-columns:1fr;gap:12px;padding:15px}
-.recommendation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.recommendation-grid .rule-control:first-child{grid-column:1/-1}
 .modal{padding:12px}.modal-header,.modal-body{padding:16px}.modal-title{font-size:18px}
 }
 .music-cover.cover-error{opacity:.35;filter:grayscale(1)}
@@ -142,7 +128,9 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 <button type="button" class="tab-btn" id="tabLibrary" role="tab" aria-selected="false" aria-controls="catalogPanel">Biblioteca</button>
 </nav>
 <div id="catalogPanel" role="tabpanel" aria-labelledby="tabTrending">
-<div id="weightControls" class="dashboard-controls">
+
+<!-- Paineis de regras ocultos visualmente para uso público -->
+<div id="weightControls" class="dashboard-controls" style="display: none;">
 <div class="slider-group">
 <div class="slider-header"><span class="sp-label" id="spotifyWeightLabel">Peso Spotify</span><span id="valSp" class="weight-badge">1</span></div>
 <input type="range" id="weightSp" min="0" max="10" step="0.5" value="1">
@@ -152,7 +140,7 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 <input type="range" id="weightYt" min="0" max="10" step="0.5" value="2">
 </div>
 </div>
-<section id="recommendationControls" class="recommendation-controls">
+<section id="recommendationControls" class="recommendation-controls" style="display: none;">
 <div class="recommendation-heading">
 <h2 id="recommendationTitle">Filtros de Recomendação</h2>
 <p id="recommendationDescription">Ajuste os percentuais das playlists</p>
@@ -170,6 +158,8 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 <label class="rule-control"><span id="normalPercentLabel">% Normal</span><input type="number" id="ruleNormalPercent" min="0" max="100" step="1" value="75"></label>
 </div>
 </section>
+<!-- Fim dos painéis ocultos -->
+
 <section class="filters-section" id="filtersSection">
 <div class="filters-grid">
 <div class="filter-group search-full"><label for="searchGeneral" id="searchLabel">Pesquisar</label><input type="search" id="searchGeneral" autocomplete="off" placeholder="Pesquisar mapa ou artista..."></div>
@@ -332,8 +322,7 @@ function q(t){
 cm=t;let it=t==='trending';
 $('tabTrending').classList.toggle('active',it);$('tabTrending').setAttribute('aria-selected',it);
 $('tabLibrary').classList.toggle('active',!it);$('tabLibrary').setAttribute('aria-selected',!it);
-$('weightControls').classList.toggle('hidden',!it);
-$('recommendationControls').classList.toggle('hidden',!it);
+// Removida a linha que ocultava/mostrava os menus de configuração
 s();
 }
 function shuffleArray(arr) {
@@ -465,9 +454,6 @@ function s(){
 let baseFiltered=db.filter(checkFilter);
 let ct=c('showing',{count:baseFiltered.length});
 $('resultsInfo').textContent=ct.includes('undefined')?`Mostrando ${baseFiltered.length} mapas`:ct;
-let rc=$('recommendationControls'),isFew=baseFiltered.length<=100;
-rc.style.opacity=isFew?'0.5':'1';
-rc.querySelectorAll('input, select, button').forEach(el=>el.disabled=isFew);
 if(cm==='trending'){rf=masterShuffle.filter(checkFilter);lm=20}else{fl=baseFiltered.sort((A,B)=>A.title.localeCompare(B.title,'pt-BR'));lm=Math.min(Z,fl.length)}
 G();
 }
@@ -481,14 +467,15 @@ let sg=p?f.slice(r,lm):f.slice(0,lm),h=sg.map(x=>H(x)).join('');
 if(p)w.insertAdjacentHTML('beforeend',h);else w.innerHTML=h;
 let noMore=(lm>=f.length);$('endOfList')?.classList.toggle('hidden',!noMore);
 }
+
+/* Modificado para não renderizar as tags de ranking ou cotas nas capas */
 function H(s){
 let t=[s.genreLabel,s.decadeLabel].filter(Boolean).map(x=>`<span class="music-tag">${a(x)}</span>`).join('');
-let r=cm==='trending'?`<div class="rank-badges"><span class="badge badge-rank badge-spotify">SP: ${s.spotifyRank}</span><span class="badge badge-rank badge-youtube">YT: ${s.youtubeRank}</span><span class="badge badge-rank badge-final">Rank: ${s.finalRank}</span></div>`:'';
-let qb=(cm==='trending'&&s.quotaText)?`<span class="badge badge-quota quota-${s.quotaTag.toLowerCase()}">${s.quotaText}</span>`:'';
 let p=s.videoUrl&&s.audioUrl?`<button type="button" class="btn-preview" data-uuid="${a(s.uuid)}">Prévia</button>`:'';
 let c=`covers/${encodeURIComponent(s.uuid)}.webp`;
-return`<article class="music-card"><div class="music-cover-wrapper" style="background:linear-gradient(135deg,#111,${s.color} 150%)">${r}${qb}<img src="${c}" alt="${a(s.title)}" class="music-cover" loading="lazy" width="320" height="180" onerror="this.classList.add('cover-error')"><span class="badge badge-players"><span>${s.coachCount}</span><span>👤</span></span><span class="badge badge-game">${a(s.gameLabel)}</span></div><div class="music-info"><div><div class="music-name">${a(s.title)}</div><div class="music-artist">${a(s.artist)}</div></div><div class="music-tags">${t}</div>${p}</div></article>`
+return`<article class="music-card"><div class="music-cover-wrapper" style="background:linear-gradient(135deg,#111,${s.color} 150%)"><img src="${c}" alt="${a(s.title)}" class="music-cover" loading="lazy" width="320" height="180" onerror="this.classList.add('cover-error')"><span class="badge badge-players"><span>${s.coachCount}</span><span>👤</span></span><span class="badge badge-game">${a(s.gameLabel)}</span></div><div class="music-info"><div><div class="music-name">${a(s.title)}</div><div class="music-artist">${a(s.artist)}</div></div><div class="music-tags">${t}</div>${p}</div></article>`
 }
+
 function I(){return db.find(x=>x.uuid===X.activeUuid)?.bpm||120}
 function J(m){m.pause();m.removeAttribute('src');m.load()}
 function K(m){if(m.readyState>=4)return Promise.resolve();return new Promise(r=>{let d=()=>{m.removeEventListener('canplaythrough',d);r()};m.addEventListener('canplaythrough',d,{once:!0})})}
