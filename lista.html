@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <script>
-(function(){var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t)})()
+(function(){
+    const setTheme = () => document.documentElement.setAttribute('data-theme', matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    setTheme();
+    matchMedia('(prefers-color-scheme: light)').addEventListener('change', setTheme);
+})();
 </script>
 <meta name="theme-color" content="#1a1a2e">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,8 +28,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .header-content{position:relative;z-index:2;text-align:center}
 .header h1{font-size:clamp(24px,5vw,42px);font-weight:800;margin-bottom:10px;letter-spacing:-1px}
 .header-subtitle{font-size:clamp(16px,2.5vw,20px);opacity:.9}
-.theme-toggle{position:absolute;top:20px;right:20px;z-index:10;background:var(--color-card);border:2px solid var(--color-border);color:var(--color-text);min-width:44px;height:44px;padding:0 10px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:var(--transition);box-shadow:var(--shadow)}
-.theme-toggle:hover,.btn-reset:hover{background:var(--color-primary);color:#fff;border-color:var(--color-primary);transform:translateY(-2px)}
+.btn-reset:hover{background:var(--color-primary);color:#fff;border-color:var(--color-primary);transform:translateY(-2px)}
 .tabs{display:flex;gap:10px;margin-bottom:20px;border-bottom:2px solid var(--color-border);padding-bottom:10px;flex-wrap:wrap}
 .tab-btn{background:none;border:none;font-size:18px;font-weight:bold;color:var(--color-muted);cursor:pointer;padding:10px 20px;transition:var(--transition);border-radius:8px}
 .tab-btn:hover{background:rgba(102,126,234,.1);color:var(--color-primary)}
@@ -94,7 +97,7 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 .empty-state button{margin-top:16px;padding:10px 20px;background:var(--color-primary);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:var(--transition)}
 .empty-state button:hover{transform:translateY(-2px)}
 @media (max-width:768px){
-.container{padding:12px}.header{padding:30px 15px}.header h1{font-size:28px}.theme-toggle{top:15px;right:15px;min-width:38px;height:38px;padding:0 8px;font-size:11px}
+.container{padding:12px}.header{padding:30px 15px}.header h1{font-size:28px}
 .music-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px}
 .filters-section{padding:15px}
 .filters-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.search-full{grid-column:1/-1}
@@ -102,7 +105,7 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 .modal{padding:12px}.modal-header,.modal-body{padding:16px}.modal-title{font-size:18px}
 }
 .music-cover.cover-error{opacity:.35;filter:grayscale(1)}
-.tab-btn:focus-visible,.btn-preview:focus-visible,.theme-toggle:focus-visible,.btn-reset:focus-visible,.modal-close:focus-visible,input:focus-visible,select:focus-visible,.checkbox-list label:focus-within{outline:3px solid var(--color-primary);outline-offset:2px}
+.tab-btn:focus-visible,.btn-preview:focus-visible,.btn-reset:focus-visible,.modal-close:focus-visible,input:focus-visible,select:focus-visible,.checkbox-list label:focus-within{outline:3px solid var(--color-primary);outline-offset:2px}
 .percent-total{color:var(--color-muted);font-size:12px;margin-top:6px}
 .checkbox-list{display:flex;flex-wrap:wrap;gap:6px;max-height:100px;overflow-y:auto;padding:8px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface)}
 .checkbox-list label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;text-transform:none;background:var(--color-card);padding:4px 8px;border-radius:6px;border:1px solid var(--color-border);cursor:pointer}
@@ -117,7 +120,6 @@ input[type=range]::-webkit-slider-runnable-track{width:100%;height:6px;cursor:po
 </div>
 <main id="mainApp" class="hidden">
 <header class="header">
-<button type="button" class="theme-toggle" id="themeToggle"></button>
 <div class="header-content">
 <h1 id="catalogTitle">Catálogo JD</h1>
 <p class="header-subtitle" id="catalogSubtitle">Explore os mapas</p>
@@ -252,10 +254,9 @@ async function g(){
 function h(){
 if(!tr.ui)return;document.title=c('documentTitle');
 let m=document.querySelector('meta[name="description"]');if(m)m.content=c('documentDescription');
-Object.entries({loadingText:'loading',catalogTitle:'catalogTitle',catalogSubtitle:'catalogSubtitle',tabTrending:'tabTrending',tabLibrary:'tabLibrary',spotifyWeightLabel:'spotifyWeight',youtubeWeightLabel:'youtubeWeight',recommendationTitle:'recommendationTitle',recommendationDescription:'recommendationDescription',jdnextGamesLabel:'jdnextGames',jdnextPercentLabel:'jdnextPercent',lastgameLabel:'lastgame',lastgamePercentLabel:'lastgamePercent',discoverPercentLabel:'discoverPercent',normalPercentLabel:'normalPercent',searchLabel:'search',genreLabel:'genre',decadeLabel:'decade',gameLabel:'games',playersLabel:'dancers',btnResetFilters:'clear'}).forEach(([i,k])=>{if($(i))$(i).textContent=c(k)});R();
+Object.entries({loadingText:'loading',catalogTitle:'catalogTitle',catalogSubtitle:'catalogSubtitle',tabTrending:'tabTrending',tabLibrary:'tabLibrary',spotifyWeightLabel:'spotifyWeight',youtubeWeightLabel:'youtubeWeight',recommendationTitle:'recommendationTitle',recommendationDescription:'recommendationDescription',jdnextGamesLabel:'jdnextGames',jdnextPercentLabel:'jdnextPercent',lastgameLabel:'lastgame',lastgamePercentLabel:'lastgamePercent',discoverPercentLabel:'discoverPercent',normalPercentLabel:'normalPercent',searchLabel:'search',genreLabel:'genre',decadeLabel:'decade',gameLabel:'games',playersLabel:'dancers',btnResetFilters:'clear'}).forEach(([i,k])=>{if($(i))$(i).textContent=c(k)});
 }
 function i(){
-$('themeToggle').addEventListener('click',P);
 $('tabTrending').addEventListener('click',()=>q('trending'));
 $('tabLibrary').addEventListener('click',()=>q('library'));
 $('weightSp').addEventListener('input',o);
@@ -295,7 +296,7 @@ $('ruleLastgamePercent').value = rules.rLg;
 $('ruleDiscoverPercent').value = rules.rDs;
 $('ruleNormalPercent').value = rules.rNo;
 
-n();ppt();Q();R();p();
+n();ppt();p();
 }
 function l(i,v,f,S=''){
 let u=[...new Set(v)].sort((A,B)=>f(A).localeCompare(f(B),'pt-BR',{numeric:!0})),op=u.map(x=>`<option value="${a(x)}">${a(f(x))}</option>`).join('');
@@ -322,7 +323,6 @@ function q(t){
 cm=t;let it=t==='trending';
 $('tabTrending').classList.toggle('active',it);$('tabTrending').setAttribute('aria-selected',it);
 $('tabLibrary').classList.toggle('active',!it);$('tabLibrary').setAttribute('aria-selected',!it);
-// Removida a linha que ocultava/mostrava os menus de configuração
 s();
 }
 function shuffleArray(arr) {
@@ -467,8 +467,6 @@ let sg=p?f.slice(r,lm):f.slice(0,lm),h=sg.map(x=>H(x)).join('');
 if(p)w.insertAdjacentHTML('beforeend',h);else w.innerHTML=h;
 let noMore=(lm>=f.length);$('endOfList')?.classList.toggle('hidden',!noMore);
 }
-
-/* Modificado para não renderizar as tags de ranking ou cotas nas capas */
 function H(s){
 let t=[s.genreLabel,s.decadeLabel].filter(Boolean).map(x=>`<span class="music-tag">${a(x)}</span>`).join('');
 let p=s.videoUrl&&s.audioUrl?`<button type="button" class="btn-preview" data-uuid="${a(s.uuid)}">Prévia</button>`:'';
@@ -518,9 +516,7 @@ cancelAnimationFrame(X.animationFrameId);X.activeUuid=null;X.isReadyToPlay=!1;X.
 if(X.lastFocusedEl&&typeof X.lastFocusedEl.focus==='function')X.lastFocusedEl.focus();
 };
 let S=window.openModal,T=window.closeModal;
-function P(){let h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');localStorage.setItem('theme',h.getAttribute('data-theme'));R()}
-function Q(){if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}
-function R(){let i=document.documentElement.getAttribute('data-theme')==='dark',t=i?'☀ Modo Claro':'🌙 Modo Escuro';if($('themeToggle'))$('themeToggle').textContent=t}
+
 new IntersectionObserver((entries)=>{
 if(!entries[0].isIntersecting)return;
 let u=E();if(lm>=u.length)return;
